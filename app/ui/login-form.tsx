@@ -80,7 +80,7 @@ export default function LoginForm() {
           href="/"
           className="mt-2 flex h-10 items-center rounded-lg bg-gray-200 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200 active:bg-gray-300 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
         >
-          <p className="hidden md:block">Back</p>
+          <p>Back</p>
           <ArrowLeftIcon className="ml-auto h-5 w-5 text-gray-700" />
         </Link>
         <div
