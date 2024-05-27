@@ -1,16 +1,34 @@
+'use client';
+
 import { lusitana } from '@/app/ui/fonts';
 import {
   AtSymbolIcon,
   KeyIcon,
   ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
+import { useFormState, useFormStatus } from 'react-dom';
+import { authenticate } from '@/app/lib/actions';
+import clsx from 'clsx';
+import Link from 'next/link';
+import { useRef } from 'react';
 
 export default function LoginForm() {
+  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const handleTestLogin = () => {
+    if (emailRef.current && passwordRef.current) {
+      emailRef.current.value = 'user@nextmail.com';
+      passwordRef.current.value = '123456';
+    }
+  };
+
   return (
-    <form className="space-y-3">
-      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
+    <form action={dispatch} className="space-y-3" aria-describedby="form-error">
+      <div className="flex-1 rounded-lg border-2 bg-gray-50 px-6 pb-4 pt-8">
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please log in to continue.
         </h1>
@@ -28,6 +46,7 @@ export default function LoginForm() {
                 id="email"
                 type="email"
                 name="email"
+                ref={emailRef}
                 placeholder="Enter your email address"
                 required
               />
@@ -47,6 +66,7 @@ export default function LoginForm() {
                 id="password"
                 type="password"
                 name="password"
+                ref={passwordRef}
                 placeholder="Enter password"
                 required
                 minLength={6}
@@ -56,18 +76,59 @@ export default function LoginForm() {
           </div>
         </div>
         <LoginButton />
-        <div className="flex h-8 items-end space-x-1">
-          {/* Add form errors here */}
+        <Link
+          href="/"
+          className="mt-2 flex h-10 items-center rounded-lg bg-gray-200 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200 active:bg-gray-300 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        >
+          <p className="hidden md:block">Back</p>
+          <ArrowLeftIcon className="ml-auto h-5 w-5 text-gray-700" />
+        </Link>
+        <div
+          id="form-error"
+          className={clsx(
+            'flex items-end space-x-1',
+            errorMessage ? 'h-8' : 'h-1',
+          )}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {errorMessage && (
+            <>
+              <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+              <p className="text-sm text-red-500">{errorMessage}</p>
+            </>
+          )}
         </div>
       </div>
+      <SkipButton onClick={handleTestLogin} />
     </form>
   );
 }
 
 function LoginButton() {
+  const { pending } = useFormStatus();
+
   return (
-    <Button className="mt-4 w-full">
+    <Button className="mt-4 w-full" aria-disabled={pending}>
       Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+    </Button>
+  );
+}
+
+interface SkipButtonProps {
+  onClick: () => void;
+}
+
+function SkipButton({ onClick }: SkipButtonProps) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      className="mt-4 w-full bg-green-500 hover:bg-green-400 focus-visible:outline-green-500 active:bg-green-600"
+      aria-disabled={pending}
+      onClick={onClick}
+    >
+      Skip to Test! <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
     </Button>
   );
 }
